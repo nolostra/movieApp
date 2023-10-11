@@ -2,19 +2,20 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Button, FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, } from 'react-native';
 import { WebView } from 'react-native-webview';
-import backgroundImage2 from './Images/background.jpg'
+// import backgroundImage2 from './Images/background.jpg'
 import Video from 'react-native-video';
 import axios from 'axios';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import SeatMapping from './seatMapping';
+import SeatMapping from './SeatMapping';
 
-const MovieDetailScreen = ({ route }) => {
+const MovieDetailScreen = ({ route, navigation }) => {
     const { movieId } = route.params;
     const backgroundImage = useRef()
     const [dataFetched, setDataFetched] = useState(false)
     const [movieDetails, setMovieDetails] = useState({});
     const [movieImages, setMovieImages] = useState([]);
     const [showTrailer, setShowTrailer] = useState(false);
+    const posterPath = useRef()
     const [trailorDetails, setTrailorDetails] = useState('');
     const webViewRef = useRef(null);
     useEffect(() => {
@@ -26,7 +27,8 @@ const MovieDetailScreen = ({ route }) => {
         })
             .then(response => {
                 setMovieDetails(response.data);
-                // console.log("second screen", response.data)
+                posterPath.current = response.data.poster_path
+                console.log("second screen", response.data.poster_path)
             })
             .catch(error => {
                 // console.error(error);
@@ -41,6 +43,7 @@ const MovieDetailScreen = ({ route }) => {
                 setMovieImages(response.data.backdrops);
                 console.log("second images screen", response.data.backdrops)
                 backgroundImage.current = response.data.backdrops[0].file_path
+                
                 setDataFetched(true)
             })
             .catch(error => {
@@ -155,6 +158,7 @@ const MovieDetailScreen = ({ route }) => {
 
                         ) : (<ImageList images={movieImages} />)}
 
+                        
                         {movieDetails.title ? (
                             <Text style={{ top: hp('38%'), fontSize: movieDetails.title.length > 25 ? 18 : 24, fontWeight: '800', marginBottom: 10, left: 10, right: 10, position: 'absolute' }}>
                                 {movieDetails.title}
@@ -230,12 +234,43 @@ const MovieDetailScreen = ({ route }) => {
 
 
                     </View>
-                    <View style={{ flex: .4, }}>
-                        {/* Display the video player if showTrailer is true */}
-                        <SeatMapping />
+                    <View style={{ flex: .4, width: '96%' }}>
+                        <View style={{ flex: 1, }}>
+
+
+                            {/* Display the video player if showTrailer is true */}
+                            <TouchableOpacity
+                                activeOpacity={0.5} // Adjust the opacity for touch feedback
+                                onPress={() => navigation.navigate('SeatMapping', { imageDetails: posterPath.current })}
+                                style={{
+                                    backgroundColor: '#007AFF', // Button background color
+                                    borderRadius: 8, // Rounded corners
+                                    paddingVertical: 12, // Vertical padding
+                                    paddingHorizontal: 24, // Horizontal padding
+                                    borderWidth: 1, // Add a border
+                                    borderColor: '#007AFF', // Border color
+                                    flexDirection: 'row', // Horizontal layout for icon and text
+                                    alignItems: 'center', // Center items vertically
+                                    justifyContent: 'center', // Center items horizontally
+                                }}
+                            // Disable the button while loading
+                            >
+                                <Text
+                                    style={{
+                                        color: 'white', // Text color
+                                        fontSize: 16,
+                                        fontWeight: 'bold',
+                                    }}
+                                >
+                                    {'Book Tickets'}
+                                </Text>
+                            </TouchableOpacity>
+
+                        </View>
                     </View>
                 </View>
-            </ImageBackground></View>
+            </ImageBackground>
+        </View>
         // </ScrollView>
 
 

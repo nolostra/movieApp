@@ -33,7 +33,9 @@ const MovieListScreen = ({ navigation }) => {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={{ borderRadius: 30, overflow: 'hidden' }}>
-                        <TouchableOpacity onPress={() => navigation.navigate('MovieDetail', { movieId: item.id })}>
+                        <TouchableOpacity onPress={() => {
+                            console.log("movieId=> ",item.id)
+                            navigation.navigate('MovieDetail', { movieId: item.id })}}>
                             <ImageBackground
                                 source={{ uri: `https://image.tmdb.org/t/p/w500${item.backdrop_path}` }} // Replace with your image URL
                                 style={{
