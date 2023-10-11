@@ -1,12 +1,12 @@
 // MovieSearchScreen.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, Text, FlatList,TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
 const MovieSearchScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-
+    const [dataSearched,setDataSearched] =  useState(false)
     const handleSearch = () => {
         axios
             .get('https://api.themoviedb.org/3/search/movie', {
@@ -23,13 +23,23 @@ const MovieSearchScreen = ({ navigation }) => {
                 console.error(error);
             });
     };
+    useEffect(()=>{
+        if(searchQuery == ''){
+            setDataSearched(false)
+        }else{
+            handleSearch()
+            setDataSearched(true)
+        }
+    },[searchQuery])
 
     return (
         <View style={{ flex: 1, backgroundColor: '#222', padding: 16 }}>
             <TextInput
-                placeholder="Enter movie title..."
+                placeholder="Enter movie title to Search..."
                 value={searchQuery}
-                onChangeText={text => setSearchQuery(text)}
+                onChangeText={text => {setSearchQuery(text)
+                    
+                }}
                 style={{
                     backgroundColor: '#333', // Dark gray background color
                     borderRadius: 5,
@@ -39,20 +49,10 @@ const MovieSearchScreen = ({ navigation }) => {
                 }}
                 placeholderTextColor="#999" // Placeholder text color
             />
-            <Button
-                title="Search"
-                onPress={handleSearch}
-                color="#007AFF" // Text color
-                style={{
-                    backgroundColor: '#333', // Background color
-                    borderRadius: 8, // Rounded corners
-                    paddingVertical: 12, // Vertical padding
-                    paddingHorizontal: 24, // Horizontal padding
-                }}
-            />
+            
 
 
-            {searchResults.length > 0 ? (
+            {dataSearched && (<View style={{flex: 1,}}>{searchResults.length > 0 ? (
                 <FlatList
                     data={searchResults}
                     keyExtractor={item => item.id.toString()}
@@ -88,7 +88,7 @@ const MovieSearchScreen = ({ navigation }) => {
                 />
             ) : (
                 <Text style={{ color: 'white', fontSize: 18 }}>No results found</Text>
-            )}
+            )}</View>)}
         </View>
 
     );

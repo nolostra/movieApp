@@ -1,14 +1,17 @@
 // MovieDetailScreen.js
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Button, FlatList, Image,TouchableOpacity } from 'react-native';
+import { View, Text, Button, FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, } from 'react-native';
 import { WebView } from 'react-native-webview';
-
+import backgroundImage2 from './Images/background.jpg'
 import Video from 'react-native-video';
 import axios from 'axios';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import SeatMapping from './seatMapping';
 
 const MovieDetailScreen = ({ route }) => {
     const { movieId } = route.params;
+    const backgroundImage = useRef()
+    const [dataFetched, setDataFetched] = useState(false)
     const [movieDetails, setMovieDetails] = useState({});
     const [movieImages, setMovieImages] = useState([]);
     const [showTrailer, setShowTrailer] = useState(false);
@@ -26,7 +29,7 @@ const MovieDetailScreen = ({ route }) => {
                 // console.log("second screen", response.data)
             })
             .catch(error => {
-                console.error(error);
+                // console.error(error);
             });
         // Fetch movie Images using the TMdb API
         axios.get(`https://api.themoviedb.org/3/movie/${movieId}/images`, {
@@ -36,7 +39,9 @@ const MovieDetailScreen = ({ route }) => {
         })
             .then(response => {
                 setMovieImages(response.data.backdrops);
-                // console.log("second images screen", response.data)
+                console.log("second images screen", response.data.backdrops)
+                backgroundImage.current = response.data.backdrops[0].file_path
+                setDataFetched(true)
             })
             .catch(error => {
                 console.error(error);
@@ -53,12 +58,13 @@ const MovieDetailScreen = ({ route }) => {
             <Image
                 src={`https://image.tmdb.org/t/p/w500${item.file_path}`}
                 style={{
-                    width: wp("100%"),
+                    width: wp("97%"),
                     height: hp('30%'), // Adjust the height as needed
                     margin: 8,
+                    borderRadius: 10
                 }} />
         );
-        console.log("--", movieImages)
+        // console.log("--", movieImages)
         return (
             <View style={{
                 flex: 1,
@@ -99,68 +105,117 @@ const MovieDetailScreen = ({ route }) => {
             webViewRef.current.injectJavaScript('document.querySelector("video").play();');
         }
     }, [showTrailer]);
+
+
+    const injectJavaScript = `
+    var iframe = document.querySelector('iframe');
+    var player = new YT.Player(iframe);
+    
+    player.addEventListener('onStateChange', function(event) {
+        if (event.data === YT.PlayerState.ENDED) {
+            window.ReactNativeWebView.postMessage('videoEnded');
+        }
+    });
+`;
+
+    const onMessage = event => {
+        if (event.nativeEvent.data === 'videoEnded') {
+            // Do something when the video ends
+            console.log('Video has ended');
+        }
+    };
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: "black" }}>
-            <View style={{ flex: 1, margin: hp('1%') }}>
-                {showTrailer ? (
-                    <WebView
-                        ref={webViewRef}
-                        javaScriptEnabled={true}
-                        domStorageEnabled={true}
-                        source={{ uri: `https://www.youtube.com/embed/${trailorDetails}?autoplay=1` }}
-                        style={{
-                            flex: .7,
-                            height: hp('70%'), // 70% of height device screen
-                            width: wp('95%')
-                        }}
-                        allowsFullscreenVideo={true}
-                        mediaPlaybackRequiresUserAction={false} // Enable autoplay
-                        onError={(error) => console.error(error)}
-                    />
+        // <ScrollView >
+        <View style={{ flex: 1 }}>
+            <ImageBackground
+                source={{ uri: `https://image.tmdb.org/t/p/w500${backgroundImage.current}` }} // Replace with the path to your background image
+                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+            >
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)', width: '100%' }}>
+                    <View style={{ flex: 1, margin: hp('1%') }}>
 
-                ) : (<ImageList images={movieImages} />)}
+                        {showTrailer ? (
+                            <WebView
+                                ref={webViewRef}
+                                javaScriptEnabled={true}
+                                domStorageEnabled={true}
+                                source={{ uri: `https://www.youtube.com/embed/${trailorDetails}?autoplay=1` }}
+                                style={{
+                                    flex: .85,
+                                    height: hp('60%'), // 70% of height device screen
+                                    width: wp('97%'),
+                                    borderRadius: 10
+                                }}
+                                allowsFullscreenVideo={true}
+                                mediaPlaybackRequiresUserAction={false} // Enable autoplay
+                                onError={(error) => console.error(error)}
+                                injectedJavaScript={injectJavaScript}
+                                onMessage={onMessage}
+                            />
 
-                <Text style={{ position: 'absolute', top: hp('34%'), fontSize: 30, fontWeight: 'bold', marginBottom: 10, left: 10, right: 10 }}>
-                    {movieDetails.title}
-                </Text>
+                        ) : (<ImageList images={movieImages} />)}
+
+                        {movieDetails.title ? (
+                            <Text style={{ top: hp('38%'), fontSize: movieDetails.title.length > 25 ? 18 : 24, fontWeight: '800', marginBottom: 10, left: 10, right: 10, position: 'absolute' }}>
+                                {movieDetails.title}
+                            </Text>
+                        ) : null}
 
 
-                <Text style={{ fontSize: 16, marginBottom: 10, textAlign: 'center' }}>
-                    {movieDetails.overview}
-                </Text>
 
-                <TouchableOpacity
-                    activeOpacity={0.8} // Adjust the opacity for touch feedback
-                    onPress={async () => {
-                        await getTrailer();
-                        watchTrailer();
-                        console.log("details--", movieImages);
-                    }}
-                    style={{
-                        backgroundColor: '#007AFF', // Button background color
-                        borderRadius: 8, // Rounded corners
-                        paddingVertical: 12, // Vertical padding
-                        paddingHorizontal: 24, // Horizontal padding
-                        borderWidth: 1, // Add a border
-                        borderColor: '#007AFF', // Border color
-                        flexDirection: 'row', // Horizontal layout for icon and text
-                        alignItems: 'center', // Center items vertically
-                        justifyContent: 'center', // Center items horizontally
-                    }}
-                   // Disable the button while loading
-                >
-                    
-                    <Text
-                        style={{
-                            color: 'white', // Text color
-                            fontSize: 16,
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        {showTrailer ? 'Done' : 'Watch Trailer'}
-                    </Text>
-                </TouchableOpacity>
-                {/* {showTrailer && (
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                            {movieDetails.overview ? (
+                                movieDetails.overview.length > 300 ? (
+                                    <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                                        {`${movieDetails.overview.substring(0, 300)}...`}
+                                    </Text>
+                                ) : (
+                                    <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                                        {movieDetails.overview}
+                                    </Text>
+                                )
+                            ) : (
+                                <Text style={{ fontSize: 16, textAlign: 'center' }}>
+                                    No overview available.
+                                </Text>
+                            )}
+                        </View>
+
+
+
+                        <TouchableOpacity
+                            activeOpacity={0.5} // Adjust the opacity for touch feedback
+                            onPress={async () => {
+                                await getTrailer();
+                                watchTrailer();
+                                // console.log("details--", movieImages);
+                            }}
+                            style={{
+                                backgroundColor: '#007AFF', // Button background color
+                                borderRadius: 8, // Rounded corners
+                                paddingVertical: 12, // Vertical padding
+                                paddingHorizontal: 24, // Horizontal padding
+                                borderWidth: 1, // Add a border
+                                borderColor: '#007AFF', // Border color
+                                flexDirection: 'row', // Horizontal layout for icon and text
+                                alignItems: 'center', // Center items vertically
+                                justifyContent: 'center', // Center items horizontally
+
+                            }}
+                        // Disable the button while loading
+                        >
+
+                            <Text
+                                style={{
+                                    color: 'white', // Text color
+                                    fontSize: 16,
+                                    fontWeight: 'bold',
+                                }}
+                            >
+                                {showTrailer ? 'Done' : 'Watch Trailer'}
+                            </Text>
+                        </TouchableOpacity>
+                        {/* {showTrailer && (
                     <Button
                         title="Done"
                         onPress={async () => {
@@ -174,11 +229,15 @@ const MovieDetailScreen = ({ route }) => {
                 )} */}
 
 
-            </View>
-            <View style={{ flex: .6, }}>
-                {/* Display the video player if showTrailer is true */}
-            </View>
-        </View>
+                    </View>
+                    <View style={{ flex: .4, }}>
+                        {/* Display the video player if showTrailer is true */}
+                        <SeatMapping />
+                    </View>
+                </View>
+            </ImageBackground></View>
+        // </ScrollView>
+
 
     );
 };

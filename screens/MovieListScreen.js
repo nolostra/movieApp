@@ -48,7 +48,7 @@ const MovieListScreen = ({ navigation }) => {
                                 <View
                                     // onPress={() => navigation.navigate('MovieDetail', { movieId: item.id })}
                                     style={{
-                                        backgroundColor: 'rgba(51, 51, 51, 0.5)', // Semi-transparent background color
+                                        backgroundColor: 'rgba(51, 51, 51, 0.7)', // Semi-transparent background color
                                         borderRadius: 10, // Rounded corners
                                         paddingHorizontal: 16, // Horizontal padding
                                         paddingVertical: 12, // Vertical padding
@@ -87,7 +87,7 @@ const MovieListScreen = ({ navigation }) => {
                     position: 'absolute',
                     bottom: 36,
                     right: 16,
-                    backgroundColor: '#333', // Subdued background color
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent background color
                     borderRadius: 8, // Rounded corners
                     paddingVertical: 12, // Vertical padding
                     paddingHorizontal: 24, // Horizontal padding
