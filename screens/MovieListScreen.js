@@ -5,6 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
 import Svg, { Path } from 'react-native-svg';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import BottomBar from '../component/bottombar.component';
 // import TopBar from '../component/topBar';
 
 const MovieListScreen = ({ navigation }) => {
@@ -66,7 +67,7 @@ const MovieListScreen = ({ navigation }) => {
                                 source={{ uri: `https://image.tmdb.org/t/p/w500${item.backdrop_path}` }} // Replace with your image URL
                                 style={{
                                     flex: 1,
-                                    height: hp("28%"),
+                                    height: hp("26%"),
                                     resizeMode: 'cover',
                                     margin: 5,
                                     borderRadius: 10,
@@ -119,6 +120,7 @@ const MovieListScreen = ({ navigation }) => {
 
                 )}
             />
+            <BottomBar/>
         </View>
 
     );

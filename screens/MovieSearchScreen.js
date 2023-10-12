@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, Text, FlatList, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
 import axios from 'axios';
 import Svg, { Path } from 'react-native-svg';
-
+import BottomBar from '../component/bottombar.component';
+import { useNavigation } from '@react-navigation/native';
 const MovieSearchScreen = ({ navigation }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -51,7 +52,7 @@ const MovieSearchScreen = ({ navigation }) => {
         },
         {
             "poster_path": "/51tqzRtKMMZEYUpSYkrUE7v9ehm.jpg",
-            "genre": "Adventure"
+            "genre": "Racing"
         },
 
     ]
@@ -229,7 +230,7 @@ const MovieSearchScreen = ({ navigation }) => {
         );
     };
 
-
+    // const navigation = useNavigation();
     const renderItem = ({ item }) => (
 
         <ImageBackground
@@ -241,76 +242,98 @@ const MovieSearchScreen = ({ navigation }) => {
     );
     return (
         <View style={{ flex: 1, paddingTop: 15 }}>
-            <View style={{ paddingHorizontal: 10, padding: 10 }}>
+            <View style={{ paddingHorizontal: 10, padding: 10,elevation: 10, }}>
                 <View
                     style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: '#DBDBDF',
+                        // flexDirection: 'row',
+                        // alignItems: 'center',
+                        // backgroundColor: '#DBDBDF',
                         borderRadius: 30,
                         marginBottom: 12,
+                        
 
                     }}
                 >
                     {
                         showBackButtonOnTop ? (
-                            <View>
-                                
+                            <View style={styles.container2}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        navigation.goBack();
+                                    }}
+                                    style={styles.iconContainer}
+                                >
+                                    <Svg style={styles.vector} width="36" height="18" viewBox="0 0 11 18" fill="none">
+                                        <Path d="M9.75 16.5L2.25 9L9.75 1.5" stroke="#202C43" strokeWidth="2" />
+                                    </Svg>
+                                </TouchableOpacity>
+                                <Text style={styles.resultsText}>
+                                    {searchQuery.length} Results Found
+                                </Text>
                             </View>
                         ) : (
-                            <View>
-                                
-                            </View>
-                        )
-                    }
-                    <Svg
-                        height={18}
-                        width={50}
-                        viewBox="0 0 42 42"
-                        style={{ margin: 10 }}
-                    >
-                        <Path
-                            d="M 21 3 C 11.6211 3 4 10.6211 4 20 C 4 29.3789 11.6211 37 21 37 C 24.7109 37 28.1406 35.8047 30.9375 33.7813 L 44.0938 46.9063 L 46.9063 44.0938 L 33.9063 31.0625 C 36.4609 28.0859 38 24.2227 38 20 C 38 10.6211 30.3789 3 21 3 Z M 21 5 C 29.2969 5 36 11.7031 36 20 C 36 28.2969 29.2969 35 21 35 C 12.7031 35 6 28.2969 6 20 C 6 11.7031 12.7031 5 21 5 Z"
-                            fill="black"
-                        />
-                    </Svg>
-                    <TextInput
-                        placeholder="TV Shows, Movies, and More..."
-                        value={searchQuery}
-                        onChangeText={(text) => setSearchQuery(text)}
-                        style={{
-                            flex: 1.3,
-                            padding: 12,
-                            color: '#827D88',
-                        }}
-                        returnKeyType="done"
-                        onSubmitEditing={(e) => { setShowBackButtonOnTop(true) }}
-                        placeholderTextColor="#999"
-                    />
-                    {searchQuery.length > 0 && (
-                        <View >
-                            <TouchableOpacity
-                                onPress={clearSearch}
-                                style={{ padding: 10 }}
-                            >
+                            <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                backgroundColor: '#DBDBDF',
+                                borderRadius: 30,
+                                // marginBottom: 12,
+
+                            }}>
+
                                 <Svg
-                                    height={30}
-                                    width={15}
-                                    viewBox="0 0 100 100"  // Adjust the viewBox dimensions
-                                    style={{ marginRight: 20 }}
+                                    height={18}
+                                    width={50}
+                                    viewBox="0 0 42 42"
+                                    style={{ margin: 10 }}
                                 >
                                     <Path
-                                        d="M 6 90 c -1.536 0 -3.071 -0.586 -4.243 -1.758 c -2.343 -2.343 -2.343 -6.142 0 -8.484 l 78 -78 c 2.342 -2.343 6.143 -2.343 8.484 0 c 2.344 2.343 2.344 6.142 0 8.485 l -78 78 C 9.071 89.414 7.536 90 6 90 Z"
-                                        fill="black"
-                                    />
-                                    <Path
-                                        d="M 84 90 c -1.535 0 -3.071 -0.586 -4.242 -1.758 l -78 -78 c -2.343 -2.343 -2.343 -6.142 0 -8.485 c 2.343 -2.343 6.143 -2.343 8.485 0 l 78 78 c 2.344 2.343 2.344 6.142 0 8.484 C 87.071 89.414 85.535 90 84 90 Z"
+                                        d="M 21 3 C 11.6211 3 4 10.6211 4 20 C 4 29.3789 11.6211 37 21 37 C 24.7109 37 28.1406 35.8047 30.9375 33.7813 L 44.0938 46.9063 L 46.9063 44.0938 L 33.9063 31.0625 C 36.4609 28.0859 38 24.2227 38 20 C 38 10.6211 30.3789 3 21 3 Z M 21 5 C 29.2969 5 36 11.7031 36 20 C 36 28.2969 29.2969 35 21 35 C 12.7031 35 6 28.2969 6 20 C 6 11.7031 12.7031 5 21 5 Z"
                                         fill="black"
                                     />
                                 </Svg>
-                                {/* <Text style={{fontSize:25}}>X</Text> */}
-                            </TouchableOpacity></View>
-                    )}
+                                <TextInput
+                                    placeholder="TV Shows, Movies, and More..."
+                                    value={searchQuery}
+                                    onChangeText={(text) => setSearchQuery(text)}
+                                    style={{
+                                        flex: 1.3,
+                                        padding: 12,
+                                        color: '#827D88',
+                                    }}
+                                    returnKeyType="done"
+                                    onSubmitEditing={(e) => { setShowBackButtonOnTop(true) }}
+                                    placeholderTextColor="#999"
+                                />
+                                {searchQuery.length > 0 && (
+                                    <View >
+                                        <TouchableOpacity
+                                            onPress={clearSearch}
+                                            style={{ padding: 10 }}
+                                        >
+                                            <Svg
+                                                height={30}
+                                                width={15}
+                                                viewBox="0 0 100 100"  // Adjust the viewBox dimensions
+                                                style={{ marginRight: 20 }}
+                                            >
+                                                <Path
+                                                    d="M 6 90 c -1.536 0 -3.071 -0.586 -4.243 -1.758 c -2.343 -2.343 -2.343 -6.142 0 -8.484 l 78 -78 c 2.342 -2.343 6.143 -2.343 8.484 0 c 2.344 2.343 2.344 6.142 0 8.485 l -78 78 C 9.071 89.414 7.536 90 6 90 Z"
+                                                    fill="black"
+                                                />
+                                                <Path
+                                                    d="M 84 90 c -1.535 0 -3.071 -0.586 -4.242 -1.758 l -78 -78 c -2.343 -2.343 -2.343 -6.142 0 -8.485 c 2.343 -2.343 6.143 -2.343 8.485 0 l 78 78 c 2.344 2.343 2.344 6.142 0 8.484 C 87.071 89.414 85.535 90 84 90 Z"
+                                                    fill="black"
+                                                />
+                                            </Svg>
+                                            {/* <Text style={{fontSize:25}}>X</Text> */}
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            </View>
+                        )
+                    }
+
                 </View>
             </View>
 
@@ -346,6 +369,7 @@ const MovieSearchScreen = ({ navigation }) => {
                     </View>
                 )}
             </View>
+            <BottomBar/>
         </View>
 
     );
@@ -370,7 +394,7 @@ const styles = StyleSheet.create({
     item: {
         flex: 1,
         margin: 10,
-        height: 220, // Adjust the height as needed
+        height: 120, // Adjust the height as needed
         borderRadius: 10,
         overflow: 'hidden',
     },
@@ -385,6 +409,24 @@ const styles = StyleSheet.create({
         left: 25,
         color: 'white', // Adjust text color as needed
         fontSize: 23, // Adjust font size as needed
+        // fontWeight:800
     },
+    container2: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height:40,
+        
+      },
+      iconContainer: {
+        marginRight: 10, // Adjust the margin as needed
+      },
+      vector: {
+        // Add your SVG styles here
+      },
+      resultsText: {
+        color: '#202C43',
+        fontSize: 25,
+        paddingLeft:20
+      },
 });
 export default MovieSearchScreen;
