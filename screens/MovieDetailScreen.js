@@ -1,12 +1,13 @@
 // MovieDetailScreen.js
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Button, FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, } from 'react-native';
+import { View, Text, Button, FlatList, Image, TouchableOpacity, ImageBackground, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
 // import backgroundImage2 from './Images/background.jpg'
 import Video from 'react-native-video';
 import axios from 'axios';
+import Svg, { Path } from 'react-native-svg';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import SeatMapping from './SeatMapping';
+import LinearGradient from 'react-native-linear-gradient';
 
 const MovieDetailScreen = ({ route, navigation }) => {
     const { movieId } = route.params;
@@ -18,8 +19,38 @@ const MovieDetailScreen = ({ route, navigation }) => {
     const posterPath = useRef()
     const [trailorDetails, setTrailorDetails] = useState('');
     const webViewRef = useRef(null);
+    const [movieData, setMovieData] = useState()
+    const [isPortrait, setIsPortrait] = useState(true);
+
+    useEffect(() => {
+        const updateLayout = () => {
+            const { width, height } = Dimensions.get('window');
+            setIsPortrait(height > width);
+        };
+
+        Dimensions.addEventListener('change', updateLayout);
+
+        return () => {
+            Dimensions.removeEventListener('change', updateLayout);
+        };
+    }, []);
+    const TopBar = () => {
+        return (
+            <View style={styles.container}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate('MovieSearchScreen');
+                }}>
+                    <Svg width="36" height="18" viewBox="0 0 11 18" fill="none">
+                        <Path d="M9.75 16.5L2.25 9L9.75 1.5" stroke="#FFFFFF" strokeWidth="2" />
+                    </Svg>
+                </TouchableOpacity>
+                <Text style={styles.leftText}>Watch</Text>
+            </View>
+        );
+    };
     useEffect(() => {
         // Fetch movie details using the TMdb API
+        console.log(movieId)
         axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
             params: {
                 api_key: 'cb58440dda48ca5af8a15d8597b7b513',
@@ -28,7 +59,9 @@ const MovieDetailScreen = ({ route, navigation }) => {
             .then(response => {
                 setMovieDetails(response.data);
                 posterPath.current = response.data.poster_path
-                console.log("second screen", response.data.poster_path)
+                setMovieData(response.data)
+                // console.log("second screen", response.data)
+
             })
             .catch(error => {
                 // console.error(error);
@@ -41,9 +74,9 @@ const MovieDetailScreen = ({ route, navigation }) => {
         })
             .then(response => {
                 setMovieImages(response.data.backdrops);
-                console.log("second images screen", response.data.backdrops)
+                // console.log("second images screen", response.data)
                 backgroundImage.current = response.data.backdrops[0].file_path
-                
+
                 setDataFetched(true)
             })
             .catch(error => {
@@ -127,149 +160,93 @@ const MovieDetailScreen = ({ route, navigation }) => {
             console.log('Video has ended');
         }
     };
+
+    function formatDate(from) {
+        const date = new Date(from);
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const dateFormatter = new Intl.DateTimeFormat('en-US', options);
+        return dateFormatter.format(date);
+    }
     return (
         // <ScrollView >
-        <View style={{ flex: 1 }}>
-            <ImageBackground
-                source={{ uri: `https://image.tmdb.org/t/p/w500${backgroundImage.current}` }} // Replace with the path to your background image
-                style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
-            >
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)', width: '100%' }}>
-                    <View style={{ flex: 1, margin: hp('1%') }}>
+        <View style={isPortrait ? styles.containerPortrait : styles.containerLandscape}>
 
-                        {showTrailer ? (
-                            <WebView
-                                ref={webViewRef}
-                                javaScriptEnabled={true}
-                                domStorageEnabled={true}
-                                source={{ uri: `https://www.youtube.com/embed/${trailorDetails}?autoplay=1` }}
-                                style={{
-                                    flex: .85,
-                                    height: hp('60%'), // 70% of height device screen
-                                    width: wp('97%'),
-                                    borderRadius: 10
-                                }}
-                                allowsFullscreenVideo={true}
-                                mediaPlaybackRequiresUserAction={false} // Enable autoplay
-                                onError={(error) => console.error(error)}
-                                injectedJavaScript={injectJavaScript}
-                                onMessage={onMessage}
-                            />
-
-                        ) : (<ImageList images={movieImages} />)}
-
-                        
-                        {movieDetails.title ? (
-                            <Text style={{ top: hp('38%'), fontSize: movieDetails.title.length > 25 ? 18 : 24, fontWeight: '800', marginBottom: 10, left: 10, right: 10, position: 'absolute' }}>
-                                {movieDetails.title}
-                            </Text>
-                        ) : null}
-
-
-
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-                            {movieDetails.overview ? (
-                                movieDetails.overview.length > 300 ? (
-                                    <Text style={{ fontSize: 16, textAlign: 'center' }}>
-                                        {`${movieDetails.overview.substring(0, 300)}...`}
-                                    </Text>
-                                ) : (
-                                    <Text style={{ fontSize: 16, textAlign: 'center' }}>
-                                        {movieDetails.overview}
-                                    </Text>
-                                )
-                            ) : (
-                                <Text style={{ fontSize: 16, textAlign: 'center' }}>
-                                    No overview available.
-                                </Text>
-                            )}
-                        </View>
-
-
-
-                        <TouchableOpacity
-                            activeOpacity={0.5} // Adjust the opacity for touch feedback
-                            onPress={async () => {
-                                await getTrailer();
-                                watchTrailer();
-                                // console.log("details--", movieImages);
-                            }}
+            <View style={isPortrait ? styles.child1Portrait : styles.child1Landscape}>
+                <ImageBackground
+                    source={{ uri: `https://image.tmdb.org/t/p/w500${backgroundImage.current}` }} // Replace with the path to your background image
+                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <View style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', width: '100%' }}>
+                        <TopBar />
+                    </View>
+                    <View style={{ flex: 1, width: "100%", }}>
+                        <LinearGradient
+                            colors={['transparent', 'rgba(51, 51, 51, .5)']} // Define your gradient colors
                             style={{
-                                backgroundColor: '#007AFF', // Button background color
-                                borderRadius: 8, // Rounded corners
-                                paddingVertical: 12, // Vertical padding
-                                paddingHorizontal: 24, // Horizontal padding
-                                borderWidth: 1, // Add a border
-                                borderColor: '#007AFF', // Border color
-                                flexDirection: 'row', // Horizontal layout for icon and text
-                                alignItems: 'center', // Center items vertically
-                                justifyContent: 'center', // Center items horizontally
-
+                                flex: 1,
+                                // Apply the gradient to the full width
                             }}
-                        // Disable the button while loading
                         >
+                            {movieData && (
+                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ color: "#FFFFFF", fontSize: 20, marginBottom: 20 }}>
+                                        In Theatres {formatDate(movieData.release_date)}
+                                    </Text>
+                                    <View style={{
+                                        flexDirection: !isPortrait ? 'row' : 'column',
+                                        alignItems: 'center', // Center horizontally
+                                    }}>
+                                        <TouchableOpacity onPress={() => { }}>
+                                            <View style={{
+                                                width: 200, // Fixed width
+                                                height: 50,  // Fixed height
+                                                backgroundColor: "rgba(97, 195, 242, 1)",
+                                                borderRadius: 10,
+                                                marginBottom: !isPortrait ? 0 : 10, // Add vertical spacing if in portrait mode
+                                                marginRight: isPortrait ? 0 : 10,
+                                                display: 'flex', // Added to ensure proper text alignment
+                                                alignItems: 'center', // Center text vertically
+                                                justifyContent: 'center', // Center text horizontally
+                                            }}>
+                                                <Text style={{ color: 'white', fontSize: 20 }}>Get Tickets</Text>
+                                            </View>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => { }}>
+                                            <View style={{
+                                                width: 200, // Fixed width
+                                                height: 50,  // Fixed height
+                                                backgroundColor: 'transparent', // Transparent background
+                                                borderColor: 'rgba(97, 195, 242, 1)', // Blue border color
+                                                borderWidth: 2, // Border width
+                                                borderRadius: 10,
+                                                marginTop: !isPortrait ? 0 : 10, // Add vertical spacing if in portrait mode
+                                                marginLeft: isPortrait ? 0 : 10,
+                                                display: 'flex', // Added to ensure proper text alignment
+                                                alignItems: 'center', // Center text vertically
+                                                justifyContent: 'center', // Center text horizontally
+                                                flexDirection:'row'
+                                            }}>
+                                                <Svg width="36" height="18" viewBox="0 0 11 18" fill="#FFFFFF">
+                                                    <Path d="M9.75 16.5L2.25 9L9.75 1.5" stroke="#FFFFFF" strokeWidth="2" />
+                                                </Svg>
+                                                <Text style={{ color: '#FFFFFF', fontSize: 20 }}>Watch Trailer</Text>
+                                            </View>
+                                            
+                                        </TouchableOpacity>
+                                    </View>
 
-                            <Text
-                                style={{
-                                    color: 'white', // Text color
-                                    fontSize: 16,
-                                    fontWeight: 'bold',
-                                }}
-                            >
-                                {showTrailer ? 'Done' : 'Watch Trailer'}
-                            </Text>
-                        </TouchableOpacity>
-                        {/* {showTrailer && (
-                    <Button
-                        title="Done"
-                        onPress={async () => {
 
-                            watchTrailer()
+                                </View>
+                            )}
 
-                        }}
-                        color="#007AFF" // Customize the button color
-
-                    />
-                )} */}
-
-
+                        </LinearGradient>
                     </View>
-                    <View style={{ flex: .4, width: '96%' }}>
-                        <View style={{ flex: 1, }}>
 
-
-                            {/* Display the video player if showTrailer is true */}
-                            <TouchableOpacity
-                                activeOpacity={0.5} // Adjust the opacity for touch feedback
-                                onPress={() => navigation.navigate('SeatMapping', { imageDetails: posterPath.current })}
-                                style={{
-                                    backgroundColor: '#007AFF', // Button background color
-                                    borderRadius: 8, // Rounded corners
-                                    paddingVertical: 12, // Vertical padding
-                                    paddingHorizontal: 24, // Horizontal padding
-                                    borderWidth: 1, // Add a border
-                                    borderColor: '#007AFF', // Border color
-                                    flexDirection: 'row', // Horizontal layout for icon and text
-                                    alignItems: 'center', // Center items vertically
-                                    justifyContent: 'center', // Center items horizontally
-                                }}
-                            // Disable the button while loading
-                            >
-                                <Text
-                                    style={{
-                                        color: 'white', // Text color
-                                        fontSize: 16,
-                                        fontWeight: 'bold',
-                                    }}
-                                >
-                                    {'Book Tickets'}
-                                </Text>
-                            </TouchableOpacity>
-
-                        </View>
-                    </View>
-                </View>
-            </ImageBackground>
+                </ImageBackground>
+            </View>
+            <View style={isPortrait ? styles.child2Portrait : styles.child2Landscape}>
+                <Text>Child View 2</Text>
+            </View>
         </View>
         // </ScrollView>
 
@@ -277,4 +254,44 @@ const MovieDetailScreen = ({ route, navigation }) => {
     );
 };
 
+const styles = StyleSheet.create({
+    containerPortrait: {
+        flex: 1,
+        flexDirection: 'column',
+    },
+    containerLandscape: {
+        flex: 1,
+        flexDirection: 'row',
+    },
+    child1Portrait: {
+        flex: 1,
+        backgroundColor: 'lightblue',
+    },
+    child2Portrait: {
+        flex: 1,
+        backgroundColor: 'lightgreen',
+    },
+    child1Landscape: {
+        flex: 1,
+        backgroundColor: 'lightblue',
+    },
+    child2Landscape: {
+        flex: 1,
+        backgroundColor: 'lightgreen',
+    },
+    container: {
+        flexDirection: 'row', // Horizontal layout
+        alignItems: 'center', // Center vertically
+        width: 70,
+        margin: 30
+    },
+    leftText: {
+        color: 'white', // Set the text color
+        fontSize: 23, // Set the font size
+        marginLeft: 8, // Add margin to create space between the icon and text
+    },
+    icon: {
+        // color: "black", // Icon color
+    },
+});
 export default MovieDetailScreen;
