@@ -30,7 +30,8 @@
     "react-native-video": "^5.2.1",
     "react-native-webview": "^13.6.2",
     "react-native-youtube-iframe": "^2.3.0",
-    "react-navigation-stack": "^2.10.4"
+    "react-navigation-stack": "^2.10.4",
+    "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

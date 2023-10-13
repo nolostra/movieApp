@@ -351,7 +351,7 @@ const MovieSearchScreen = ({ navigation }) => {
                         />
                     </View>
                 ) : (
-                    <Text style={{ color: 'white', fontSize: 18 }}>No results found</Text>
+                    <Text style={{ color: 'black', fontSize: 30 ,alignSelf:'center'}}>No results found</Text>
                 )}
 
                 </View>
