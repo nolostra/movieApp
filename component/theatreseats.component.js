@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 
 const TinyBox = ({ color, index }) => (
-  <View style={[styles.box, { backgroundColor: index === 5 || index === 16 ? 'white' : color }]} key={index}></View>
+  <View style={[styles.box, { backgroundColor: index === 3 || index === 11 ? 'white' : index == 9 ? "#CD9D0F" :color }]} key={index}></View>
 );
 
 const boxCount = 15;
@@ -40,6 +40,7 @@ const BoxArray = () => {
 
   return (
     <View style={styles.container}>
+      
       {tinyBoxesData.map((box) => (
         <TinyBox key={box.id} color={box.color} index={box.index} />
       ))}
@@ -57,6 +58,8 @@ const styles = StyleSheet.create({
     margin: 2,
     borderColor: 'gray',
     borderRadius: 10,
+    width:"100%",
+    marginTop:-150
   },
   box: {
     width: boxSize,
@@ -64,6 +67,7 @@ const styles = StyleSheet.create({
     margin: 1,
     borderBottomLeftRadius: 10, // Adjust the border radius as needed
     borderBottomRightRadius: 10,
+    marginRight:7
   },
 });
 

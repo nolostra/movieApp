@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 
 const TinyBox = ({ color, index }) => (
-  <View style={[styles.box, { backgroundColor: index === 5 || index === 13 ? 'white' : color }]} key={index}></View>
+  <View style={[styles.box, { backgroundColor: index === 4 || index === 12 ? 'white' : color }]} key={index}></View>
 );
 
 const boxCount = 17;
@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     margin: 2,
     borderColor: 'gray',
     borderRadius: 10,
+    width:"100%"
   },
   box: {
     width: boxSize,
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     margin: 1,
     borderBottomLeftRadius: 10, // Adjust the border radius as needed
     borderBottomRightRadius: 10,
+    marginRight:7
   },
 });
 

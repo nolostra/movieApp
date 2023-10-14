@@ -5,8 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MovieListScreen from './screens/MovieListScreen';
 import MovieDetailScreen from './screens/MovieDetailScreen';
 import MovieSearchScreen from './screens/MovieSearchScreen';
+
 import SeatMapping from './screens/SeatMapping';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import SeatMapping2 from './screens/seatMapping2';
 const Stack = createStackNavigator();
 Icon.loadFont(); 
 const AppNavigator = () => {
@@ -17,6 +19,7 @@ const AppNavigator = () => {
         <Stack.Screen name="MovieDetail" component={MovieDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="MovieSearchScreen" component={MovieSearchScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SeatMapping" component={SeatMapping} options={{ headerShown: false }} />
+        <Stack.Screen name="SeatMapping2" component={SeatMapping2} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     margin: 2,
     borderColor: 'gray',
     borderRadius: 10,
+    width:"100%"
   },
   box: {
     width: boxSize,
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     margin: 1,
     borderBottomLeftRadius: 10, // Adjust the border radius as needed
     borderBottomRightRadius: 10,
+    marginRight:7
   },
 });
 

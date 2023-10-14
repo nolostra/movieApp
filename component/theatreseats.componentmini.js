@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 
 const TinyBox = ({ color, index }) => (
-  <View style={[styles.box, { backgroundColor: index === 5 || index === 13 ? 'white' : "#564CA3" }]} key={index}></View>
+  <View style={[styles.box, { backgroundColor: index === 4 || index === 8 ? 'white' : color }]} key={index}></View>
 );
 
-const boxCount = 20;
-const boxSize = 12; // Adjust the size of the boxes as needed
+const boxCount = 14;
+const boxSize = 7; // Adjust the size of the boxes as needed
 
 const getCurrentTimestampInSeconds = () => Math.floor(Date.now() / 1000);
 
@@ -16,7 +16,7 @@ const getRandomColor = (seed) => {
   return colors[randomIndex];
 };
 
-const BoxArray4 = () => {
+const BoxArray5 = () => {
   const [seed, setSeed] = useState(getCurrentTimestampInSeconds());
   const [tinyBoxesData, setTinyBoxesData] = useState([]);
 
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
     margin: 2,
     borderColor: 'gray',
     borderRadius: 10,
-    width: '100%',
   },
   box: {
     width: boxSize,
@@ -65,8 +64,7 @@ const styles = StyleSheet.create({
     margin: 1,
     borderBottomLeftRadius: 10, // Adjust the border radius as needed
     borderBottomRightRadius: 10,
-    marginRight:7
   },
 });
 
-export default BoxArray4;
+export default BoxArray5;
